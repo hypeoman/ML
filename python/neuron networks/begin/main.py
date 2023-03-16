@@ -1,77 +1,31 @@
 import numpy as np
+import tensorflow as tf
 
-def sigmoid(x):
-  # Наша функция активации: f(x) = 1 / (1 + e^(-x))
-  return 1 / (1 + np.exp(-x))
+# Входные данные
+X = np.array([[170, 70], [175, 73], [180, 80], [160, 55], [165, 65], [182, 85]])
+y = np.array([0, 0, 0, 1, 1, 0]) # 0 - женщины, 1 - мужчины
 
-def mse_loss(y_true, y_pred):
-  # y_true и y_pred - массивы numpy одинаковой длины.
-  return ((y_true - y_pred) ** 2).mean()
+# Создание модели нейронной сети
+model = tf.keras.models.Sequential([
+  tf.keras.layers.Dense(64, activation='relu', input_shape=(2,)),
+  tf.keras.layers.Dense(64, activation='relu'),
+  tf.keras.layers.Dense(1, activation='sigmoid')
+])
 
-class Neuron:
-    def __init__(self, weights, bias):
-        self.weights = weights
-        self.bias = bias
+# Компиляция модели
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-    def feedforward(self, inputs):
-        # 
-        total = np.dot(self.weights, inputs) + self.bias
-        return sigmoid(total)
+# Обучение модели
+model.fit(X, y, epochs=1000)
 
+# Предсказание пола по новым данным
+new_data = np.array(
+    [
+    [164, 66],
+    [176, 67],
+    [185, 60]
+    ]
+)
 
-class OurNeuralNetwork:
-  '''
-  Нейронная сеть с:
-    - 2 входами
-    - скрытым слоем с 2 нейронами (h1, h2)
-    - выходным слоем с 1 нейроном (o1)
-  Все нейроны имеют одинаковые веса и пороги:
-    - w = [0, 1]
-    - b = 0
-  '''
-  def __init__(self):
-    weights = np.array([-2.5, 1.5])
-    bias = 0
-
-    # Используем класс Neuron из предыдущего раздела
-    self.h1 = Neuron(weights, bias)
-    self.h2 = Neuron(weights, bias)
-    self.o1 = Neuron(weights, bias)
-
-  def feedforward(self, x):
-    out_h1 = self.h1.feedforward(x)
-    out_h2 = self.h2.feedforward(x)
-
-    # Входы для o1 - это выходы h1 и h2
-    out_o1 = self.o1.feedforward(np.array([out_h1, out_h2]))
-
-    return out_o1
-
-network = OurNeuralNetwork()
-x = np.array([
-    [133, 65], # Алиса
-    [160, 72], # Боб
-    [152, 70], # Чарли
-    [120, 60]  # Диана
-    ])
-
-# 1 - женщина, 0 - мужчина
-y_true = np.array([
-    1, # Алиса
-    0, # Боб
-    0, # Чарли
-    1  # Диана
-    ])
-
-n = 4
-
-y_pred = np.array([])
-
-for i in range(0,4):
-    network = OurNeuralNetwork()
-    xn = np.array([x[i][0], x[i][1]])
-    output = network.feedforward(xn)
-    # print(output)
-    y_pred = np.append(y_pred, output)
-
-print("MSE_LOSS =",mse_loss(y_true, y_pred))
+predictions = model.predict(new_data)
+print(predictions)
