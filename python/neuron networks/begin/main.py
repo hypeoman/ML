@@ -2,8 +2,23 @@ import numpy as np
 import tensorflow as tf
 
 # Входные данные
-X = np.array([[170, 70], [175, 73], [180, 80], [160, 55], [165, 65], [182, 85]])
-y = np.array([0, 0, 0, 1, 1, 0]) # 0 - женщины, 1 - мужчины
+x = np.array([])
+y = np.array([])
+
+XY = np.loadtxt('dataset.csv', delimiter=',')
+print(XY)
+print(XY)
+
+print(XY[0][0])
+print(XY[1][2])
+
+for i in range(0, len(XY)):
+    x = x + [XY[i][0], XY[i][1]]
+    y = y + XY[i][2]
+
+print(x)
+
+print(y)
 
 # Создание модели нейронной сети
 model = tf.keras.models.Sequential([
@@ -16,16 +31,18 @@ model = tf.keras.models.Sequential([
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Обучение модели
-model.fit(X, y, epochs=1000)
+model.fit(x, y, epochs=1000)
 
 # Предсказание пола по новым данным
 new_data = np.array(
     [
     [164, 66],
     [176, 67],
-    [185, 60]
+    [185, 60],
+    [155, 53]
     ]
 )
 
 predictions = model.predict(new_data)
 print(predictions)
+
